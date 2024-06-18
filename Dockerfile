@@ -46,10 +46,11 @@ RUN apt-get update && apt-get install -y \
     php-xml \
     php-zip \
     php-gd \
-    php-ldap
+    php-ldap \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN wget https://github.com/OCSInventory-NG/OCSInventory-ocsreports/releases/download/${OCS_VERSION}/OCSNG_UNIX_SERVER-${OCS_VERSION}.tar.gz -P /tmp && \
-    tar xzf /tmp/OCSNG_UNIX_SERVER-${OCS_VERSION}.tar.gz -C /tmp;
+RUN curl -L https://github.com/OCSInventory-NG/OCSInventory-ocsreports/releases/download/${OCS_VERSION}/OCSNG_UNIX_SERVER-${OCS_VERSION}.tar.gz -o /tmp/OCSNG_UNIX_SERVER-${OCS_VERSION}.tar.gz && \
+    tar xzf /tmp/OCSNG_UNIX_SERVER-${OCS_VERSION}.tar.gz -C /tmp
 
 RUN cd /tmp/OCSNG_UNIX_SERVER-${OCS_VERSION}/Apache/ && \
     perl Makefile.PL && \
@@ -58,17 +59,12 @@ RUN cd /tmp/OCSNG_UNIX_SERVER-${OCS_VERSION}/Apache/ && \
 
 WORKDIR /etc/apache2/conf-available
 
-# Redirect Apache2 Logs to stdout e stderr
+# Redirect Apache2 Logs to stdout and stderr
 RUN ln -sf /proc/self/fd/1 /var/log/apache2/access.log && \
     ln -sf /proc/self/fd/2 /var/log/apache2/error.log
 
 COPY conf/ /tmp/conf
 
-COPY ./docker-entrypoint.sh /docker-entrypoint.sh
-COPY ./docker-entrypoint.d /docker-entrypoint.d
-
 EXPOSE 80
 
-# https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#entrypoint
-ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/usr/sbin/apache2", "-DFOREGROUND"]
