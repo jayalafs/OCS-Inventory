@@ -2,16 +2,17 @@ version: '3'
 
 services:
   ocsapplication:
-    image: ocsinventory/ocsinventory-docker-image:2.12
+    image: ocsinventory/ocsinventory-docker-image:2.12.1
     container_name: ocsinventory-server
     restart: always
     ports:
-      - "8181:80"  # Mapea el puerto 8181 del host al puerto 80 del contenedor
+      - "82:80"  # Mapea el puerto 82 del host al puerto 80 del contenedor
     volumes:
       - "perlcomdata:/etc/ocsinventory-server"
       - "ocsreportsdata:/usr/share/ocsinventory-reports/ocsreports/extensions"
       - "varlibdata:/var/lib/ocsinventory-reports"
       - "httpdconfdata:/etc/apache2/conf-available"
+      - "profilesconfdata:/usr/share/ocsinventory-reports/ocsreports/config/profiles"
     environment:
       OCS_DB_SERVER: ocsinventory-db
       OCS_DB_USER: ocsuser
@@ -19,6 +20,7 @@ services:
       OCS_DB_NAME: ocsweb
       # See documentation to set up SSL for MySQL
       OCS_SSL_ENABLED: 0
+      OCS_DBI_PRINT_ERROR: 0
     links:
       - ocsdb
     networks:
@@ -31,7 +33,7 @@ services:
     container_name: ocsinventory-db
     restart: always
     ports:
-      - "3306"  # Asegúrate de que el puerto 3306 esté disponible en el host si es necesario
+      - "3306:3306"  # Asegúrate de que el puerto 3306 esté disponible en el host si es necesario
     volumes:
       - ./sql/:/docker-entrypoint-initdb.d/
       - sqldata:/var/lib/mysql
@@ -52,3 +54,4 @@ volumes:
   varlibdata:
   httpdconfdata:
   sqldata:
+  profilesconfdata:
