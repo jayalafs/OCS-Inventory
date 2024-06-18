@@ -3,7 +3,7 @@ FROM ubuntu:22.04
 ENV OCS_VERSION 2.12.1
 
 LABEL maintainer="contact@ocsinventory-ng.org" \
-      version="2.12.1" \
+      version="${OCS_VERSION}" \
       description="OCS Inventory docker image"
 
 ARG APT_FLAGS="-y"
@@ -48,11 +48,10 @@ RUN apt-get update && apt-get install -y \
     php-gd \
     php-ldap
 
-RUN wget https://github.com/OCSInventory-NG/OCSInventory-ocsreports/releases/download/2.12.1/OCSNG_UNIX_SERVER-2.12.1.tar.gz -P /tmp && \
+RUN wget https://github.com/OCSInventory-NG/OCSInventory-ocsreports/releases/download/${OCS_VERSION}/OCSNG_UNIX_SERVER-${OCS_VERSION}.tar.gz -P /tmp && \
+    tar xzf /tmp/OCSNG_UNIX_SERVER-${OCS_VERSION}.tar.gz -C /tmp;
 
-    tar xzf /tmp/OCSNG_UNIX_SERVER-2.12.1.tar.gz -C /tmp;
-
-RUN cd /tmp/OCSNG_UNIX_SERVER-2.12.1.tar.gz/Apache/ && \
+RUN cd /tmp/OCSNG_UNIX_SERVER-${OCS_VERSION}/Apache/ && \
     perl Makefile.PL && \
     make && \
     make install
